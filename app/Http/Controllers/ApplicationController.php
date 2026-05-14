@@ -13,6 +13,7 @@ use Google\Service\GenerativeLanguage\GenerateContentRequest;
 use Google\Service\GenerativeLanguage\Content;
 use Google\Service\GenerativeLanguage\Part;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicationController extends Controller
 {
@@ -35,12 +36,16 @@ class ApplicationController extends Controller
             'resume' => 'required|mimes:pdf|max:2048', // Wajib PDF, max 2MB
         ]);
 
-        // 2. Simpan File Fisik PDF ke folder Storage (storage/app/resumes)
+        // 2. Simpan File (ini udah bener)
         $path = $request->file('resume')->store('resumes');
 
-        // 3. Ekstrak Teks dari PDF (Pakai library smalot/pdfparser)
+        // 3. Ekstrak Teks (GANTI YANG INI)
         $pdfParser = new Parser();
-        $pdf = $pdfParser->parseFile(storage_path('app/' . $path));
+
+        // Pakai Storage::path($path) biar Laravel yang nyariin alamat pastinya
+        $fullPath = Storage::path($path);
+
+        $pdf = $pdfParser->parseFile($fullPath);
         $text = $pdf->getText();
 
         // 4. Tanya ke Gemini AI (Ngekstrak Skill)
